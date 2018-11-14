@@ -31,7 +31,7 @@ const (
 	servicekeypath  = "SKEYPATH"
 	keyID           = "KEYID"
 	teamID          = "TEAMID"
-	bundleID        = "TOPIC"
+	bundleID        = "BUNDLEID"
 )
 
 func init() {

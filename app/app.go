@@ -84,6 +84,7 @@ func (a *App) prepareMsg(msg push.PushMsgStruct) {
 		Topic:       config.BundleID,
 		Payload:     m,
 	}
+	fmt.Println("cwdfwef", config.BundleID)
 	fmt.Println("prepared", notification)
 	res, err := a.apns.Push(notification)
 	if err != nil {
