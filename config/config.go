@@ -19,6 +19,8 @@ var (
 	KeyID string
 	//TeamID -  from developer account (View Account -> Membership)
 	TeamID string
+	//BundleID - app address? com.smedialink.testsigningapp
+	BundleID string
 )
 
 const (
@@ -29,6 +31,7 @@ const (
 	servicekeypath  = "SKEYPATH"
 	keyID           = "KEYID"
 	teamID          = "TEAMID"
+	bundleID        = "TOPIC"
 )
 
 func init() {
@@ -75,5 +78,9 @@ func LoadEnvironment() {
 	TeamID = os.Getenv(teamID)
 	if TeamID == "" {
 		log.Fatal("keyID must be set")
+	}
+	BundleID = os.Getenv(bundleID)
+	if TeamID == "" {
+		log.Fatal("topic must be set")
 	}
 }

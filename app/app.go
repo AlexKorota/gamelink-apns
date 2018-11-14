@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"gamelink-apns/config"
 	push "gamelink-go/proto_nats_msg"
@@ -52,6 +53,7 @@ func (a *App) GetAndPush() {
 	_, err := a.nc.Subscribe(config.NatsApnsChan, func(m *nats.Msg) {
 		err := proto.Unmarshal(m.Data, &msgStruct)
 		if err != nil {
+			log.Fatal(err)
 			return
 		}
 		fmt.Println("msgStruct", msgStruct)
@@ -67,20 +69,33 @@ func (a *App) GetAndPush() {
 }
 
 func (a *App) prepareMsg(msg push.PushMsgStruct) {
-	p := fmt.Sprintf("{\"aps\":{\"alert\":%s}}", msg.Message)
+	p := map[string]interface{}{
+		"aps": map[string]string{
+			"alert": msg.Message,
+		},
+	}
+	m, err := json.Marshal(p)
+	if err != nil {
+		log.Warn(err)
+	}
+	fmt.Println(p)
 	notification := &apns2.Notification{
 		DeviceToken: msg.UserInfo.DeviceID,
-		Topic:       "Rocket-X",
-		Payload:     []byte(p),
+		Topic:       config.BundleID,
+		Payload:     m,
 	}
 	fmt.Println("prepared", notification)
 	res, err := a.apns.Push(notification)
 	if err != nil {
 		log.Warn(err)
+		return
 	}
-	if res.Sent() {
-		log.Println("Sent:", res.ApnsID)
-	} else {
-		fmt.Printf("Not Sent: %v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)
+	fmt.Println(res)
+	if res != nil {
+		if res.Sent() {
+			log.Println("Sent:", res.ApnsID)
+		} else {
+			fmt.Printf("Not Sent: %v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)
+		}
 	}
 }
