@@ -3,7 +3,6 @@ package app
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"gamelink-apns/config"
 	push "gamelink-go/proto_nats_msg"
 	"github.com/gogo/protobuf/proto"
@@ -56,7 +55,6 @@ func (a *App) GetAndPush() {
 			log.Fatal(err)
 			return
 		}
-		fmt.Println("msgStruct", msgStruct)
 		a.mchan <- msgStruct
 	})
 	if err != nil {
@@ -78,25 +76,21 @@ func (a *App) prepareMsg(msg push.PushMsgStruct) {
 	if err != nil {
 		log.Warn(err)
 	}
-	fmt.Println(p)
 	notification := &apns2.Notification{
 		DeviceToken: msg.UserInfo.DeviceID,
 		Topic:       config.BundleID,
 		Payload:     m,
 	}
-	fmt.Println("cwdfwef", config.BundleID)
-	fmt.Println("prepared", notification)
 	res, err := a.apns.Push(notification)
 	if err != nil {
 		log.Warn(err)
 		return
 	}
-	fmt.Println(res)
 	if res != nil {
 		if res.Sent() {
 			log.Println("Sent:", res.ApnsID)
 		} else {
-			fmt.Printf("Not Sent: %v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)
+			log.Warn("Not Sent: %v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)
 		}
 	}
 }
