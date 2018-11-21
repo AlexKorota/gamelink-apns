@@ -19,11 +19,13 @@ type App struct {
 }
 
 func NewApp() App {
+	log.Warn("starting...")
 	mchan := make(chan push.PushMsgStruct)
 	return App{mchan: mchan}
 }
 
 func (a *App) ConnectNats() {
+	log.Warn("connecting nats")
 	nc, err := nats.Connect(config.NatsDialAddress)
 	if err != nil {
 		log.Fatal(err)
@@ -32,6 +34,7 @@ func (a *App) ConnectNats() {
 }
 
 func (a *App) ConnectApns(ctx context.Context) {
+	log.Warn("config apns connection")
 	authKey, err := token.AuthKeyFromFile(config.ServiceKeyPath)
 	if err != nil {
 		log.Fatal("token error:", err)
@@ -55,6 +58,7 @@ func (a *App) GetAndPush() {
 			log.Fatal(err)
 			return
 		}
+		log.Warn("getting new message struct")
 		a.mchan <- msgStruct
 	})
 	if err != nil {
@@ -67,6 +71,7 @@ func (a *App) GetAndPush() {
 }
 
 func (a *App) prepareMsg(msg push.PushMsgStruct) {
+	log.Warn("prepare push")
 	p := map[string]interface{}{
 		"aps": map[string]string{
 			"alert": msg.Message,
