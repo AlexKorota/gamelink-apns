@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gamelink-apns-config
+  namespace: default
+data:
+  SKEYPATH: "/etc/key/AuthKey_WXFBQV4SXB.p8"
+  KEYID: "WXFBQV4SXB"
+  TEAMID: "YRL9Q8Z5Z4"
+  BUNDLEID: "com.smedialink.testsigningapp"

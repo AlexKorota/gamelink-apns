@@ -1,0 +1,56 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gamelink-apns
+  labels:
+    app: gamelink-apns
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gamelink-apns
+    spec:
+      containers:
+        - name: gamelink-apns
+          #          image: 'registry.gitlab.smedialink.com/z/...'
+          image: 'mrcarrot/gamelink-apns:latest'
+          volumeMounts:
+            - name: key
+              mountPath: "/etc/key"
+              readOnly: true
+          env:
+          - name: NATSDIAL
+            valueFrom:
+              configMapKeyRef:
+                name: gamelink-config
+                key: NATSDIAL
+          - name: NATSCHANAPNS
+            valueFrom:
+              configMapKeyRef:
+                name: gamelink-config
+                key: NATSCHANAPNS
+          - name: SKEYPATH
+            valueFrom:
+              configMapKeyRef:
+                name: gamelink-apns-config
+                key: SKEYPATH
+          - name: KEYID
+            valueFrom:
+              configMapKeyRef:
+                name: gamelink-apns-config
+                key: KEYID
+          - name: TEAMID
+            valueFrom:
+              configMapKeyRef:
+                name: gamelink-apns-config
+                key: TEAMID
+          - name: BUNDLEID
+            valueFrom:
+              configMapKeyRef:
+                name: gamelink-apns-config
+                key: BUNDLEID
+      volumes:
+        - name: key
+          secret:
+            secretName: apns-key

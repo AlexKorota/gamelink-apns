@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"gamelink-apns/config"
 	push "gamelink-go/proto_nats_msg"
 	"github.com/gogo/protobuf/proto"
@@ -47,6 +48,8 @@ func (a *App) ConnectApns(ctx context.Context) {
 		TeamID: config.TeamID,
 	}
 	a.apns = apns2.NewTokenClient(t)
+	a.apns.Production() // Выставить в продакшн, когда приложуха будет в апсторе
+	log.Println(a.apns)
 }
 
 func (a *App) GetAndPush() {
@@ -59,6 +62,7 @@ func (a *App) GetAndPush() {
 			return
 		}
 		log.Warn("getting new message struct")
+		log.Warn(msgStruct)
 		a.mchan <- msgStruct
 	})
 	if err != nil {
@@ -95,7 +99,7 @@ func (a *App) prepareMsg(msg push.PushMsgStruct) {
 		if res.Sent() {
 			log.Println("Sent:", res.ApnsID)
 		} else {
-			log.Warn("Not Sent: %v %v %v\n", res.StatusCode, res.ApnsID, res.Reason)
+			log.Warn(fmt.Sprintf("Not Sent: %d %s %s", res.StatusCode, res.ApnsID, res.Reason))
 		}
 	}
 }
